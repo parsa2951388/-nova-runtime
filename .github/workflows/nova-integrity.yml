@@ -40,6 +40,9 @@ jobs:
       - name: Verify exact upstream pin
         run: python scripts/verify_upstream.py
 
+      - name: Scan NOVA-owned tracked files for game data
+        run: python -I scripts/check_no_game_data.py
+
       - name: Scan upstream checkout for game data
         working-directory: engine/leonida
         run: python -I scripts/check_no_game_data.py
