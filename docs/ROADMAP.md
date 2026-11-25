@@ -30,6 +30,7 @@ A stage is complete only when its evidence is recorded. Upstream functionality i
 
 ## Stage 3 — NOVA experience
 
+- [x] Define the first NOVA visual identity, wordmark, palette, and usage guide.
 - [ ] Create the NOVA setup and first-run experience without changing upstream engine semantics.
 - [ ] Add a clearer compatibility report and diagnostics bundle.
 - [ ] Add resumable setup guidance and storage planning for separate work/output drives.
