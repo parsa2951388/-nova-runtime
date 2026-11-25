@@ -16,6 +16,8 @@ NOVA Runtime is being built around the open-source Leonida engine lineage. NOVA 
 
 See [the NOVA brand guide](docs/BRAND.md) for the logo, palette, and interface principles.
 
+Launch the desktop setup console with `python nova_gui.py`; see [GUI documentation](docs/GUI.md).
+
 ## Repository layout
 
 - `engine/leonida/` — canonical upstream engine, pinned as a Git submodule.
