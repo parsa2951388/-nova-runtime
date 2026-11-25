@@ -30,7 +30,7 @@ Clone with submodules so the engine is present:
 
 ```sh
 git clone --recurse-submodules https://github.com/parsa2951388/-nova-runtime.git
-cd -nova-runtime
+cd ./-nova-runtime
 python nova.py doctor
 ```
 
