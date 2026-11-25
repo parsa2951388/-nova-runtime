@@ -1,45 +1,60 @@
-# Architecture notes
+# NOVA Runtime architecture
 
-> This document records the architecture described by the reviewed Leonida upstream. It is a design reference only: the NOVA repository does not yet contain the runtime implementation.
+## Repository boundary
 
-## End-to-end model
+NOVA keeps its own user-facing layer at the repository root and pins the upstream implementation at:
 
-The upstream project describes a local build pipeline that takes an already-readable Xbox Series package supplied by the user and creates PC-side runtime components. The broad flow is:
+- Path: `engine/leonida/`
+- Remote: https://github.com/ubiquitarianism/leonida.git
+- Pinned commit: `b9320a118d46b24de665e30e577425c131b4a2ee`
+- Branch used for future upstream updates: `main`
 
-1. **Local package check** — identify the expected package/version and verify the files available on the user's machine. This stage must not obtain keys, decrypt protected content, or bypass access controls.
-2. **Shader pipeline** — carve and disassemble the console's RDNA2 shader programs, translate them to SPIR-V, and validate the generated SPIR-V.
-3. **Local asset pipeline** — process models, textures, and audio from the user's package into local working/output directories. Generated assets are user data and must never be committed or distributed by NOVA.
-4. **Runtime loader** — load the executable image and resolve the required imports through compatibility shims.
-5. **Graphics compatibility layer** — map the console-facing D3D12-style interface to Vulkan-backed operations.
-6. **Validation and diagnostics** — run semantic tests, runtime tests, shader/pipeline checks, and GPU-specific diagnostics; report unsupported behavior rather than hiding it.
+The submodule preserves the upstream repository's own commit history and attribution. Do not copy the engine into a second source tree or change its pinned revision without updating [UPSTREAM.md](UPSTREAM.md), the submodule pointer, and the roadmap.
 
-## Upstream components observed
+## NOVA-owned layer
 
-| Upstream area | Role described by upstream | NOVA status |
-|---|---|---|
-| `make_game.py` | Build orchestration and local package discovery/checks | Not imported |
-| `tools/` | Shader and asset tooling | Not imported |
-| `runtime/` | Loader, compatibility shims, Vulkan diagnostics | Not imported |
-| `tests/` and `scripts/` | Regression tests and validation runners | Not imported |
-| `viewer/` | Local viewer for exported world data | Not imported |
-| `third_party/` | External dependencies and submodules | Not imported |
+`nova.py` is a deliberately thin Python front end:
 
-## Platform direction
+1. `doctor` reports whether the local tools, engine checkout, and disk budget meet the documented prerequisites.
+2. `engine-help` shows the pinned engine's own help.
+3. `build` forwards the supplied arguments to `engine/leonida/make_game.py` using the current Python interpreter and isolated mode.
 
-The upstream README describes Windows as the primary runtime environment, Linux support for several tools and Vulkan diagnostics, and macOS support for selected tools and testing paths. These statements describe the upstream project, not a tested NOVA build.
+The wrapper must not reimplement shader translation, package parsing, runtime loading, or graphics compatibility. Those remain upstream engine responsibilities unless a separately reviewed NOVA patch is introduced.
 
-## Engineering rules
+## Upstream engine pipeline
 
-- Keep the runtime and build pipeline deterministic where possible.
-- Keep all game-derived data local to the user's machine.
-- Never put proprietary game data in tests, fixtures, logs, issues, pull requests, or releases.
-- When a format is encrypted or protected, stop; do not add a decryption or circumvention path.
-- Preserve upstream author credits, license files, and third-party notices when source is integrated.
-- Add tests for behavior changes before changing core translation or runtime semantics.
-- Clearly distinguish measured behavior, tested behavior, and hypotheses in documentation.
+As documented by the pinned upstream revision, the broad pipeline is:
 
-## Baseline source
+1. **Local package check** — identify and validate the expected package/version already readable on the user's machine.
+2. **Shader pipeline** — carve and disassemble RDNA2 programs, translate them to SPIR-V, and validate the result.
+3. **Local asset processing** — process models, textures, and audio from the local package into working/output folders.
+4. **Runtime loader** — load the executable image and resolve imports through compatibility shims.
+5. **Graphics compatibility** — map the console-facing D3D12-style interface to Vulkan-backed operations.
+6. **Testing and diagnostics** — semantic regression tests, runtime tests, shader/pipeline checks, and GPU-specific diagnostics.
 
-- Repository: https://github.com/ExCorvus/leonida
-- Reviewed snapshot: `8eee35cfdccc613a1f7a10a5539d5bd3b25038ba`
-- License reported by upstream repository: GNU GPL v3.0
+These are upstream architectural responsibilities. Their presence in the submodule is not evidence that NOVA has reproduced or validated the complete pipeline.
+
+## External dependency
+
+The upstream repository declares `third_party/rpf9-explorer` as a nested Git submodule. Always use recursive submodule initialization:
+
+```sh
+git submodule update --init --recursive
+```
+
+## Data boundary
+
+- Game packages and all files generated from them stay on the user's machine.
+- No game archives, executable, keys, shader binaries, textures, models, audio, videos, saves, or reports quoting game data may enter commits, issues, pull requests, tests, or releases.
+- If a required format is encrypted or protected, document that limitation and stop.
+- No connection to Xbox Live, Rockstar services, or other game services is part of this project.
+
+## Evidence standard
+
+NOVA documentation must label each result as one of:
+
+- **Upstream-reported** — stated by the pinned upstream project.
+- **NOVA-tested** — reproduced from a documented NOVA checkout and toolchain.
+- **Hypothesis** — not yet measured or verified.
+
+Never turn an upstream claim into a NOVA test result by rewording it.
