@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+.env.*
+
+# Build output
+build/
+build-*/
+dist/
+out/
+coverage/
+*.log
+*.tmp
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local game data and generated outputs (never commit these)
+work/
+reports/
+*.rpf
+*.ttpf
+*.xvd
+*.msixvc
+*.dxbc
+*.fssm
+*.spv
+*.spvasm
+*.dds
+*.bk2
+*.awc
+*.r9modeldata
+*.obj
+*.glb
+*.ogg
+*.wav
+*.sav
+*.exe
+*.dll
+*.pdb
