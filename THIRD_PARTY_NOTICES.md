@@ -1,19 +1,22 @@
 # Third-party notices and project lineage
 
-## Leonida
+## Leonida engine
 
-NOVA Runtime's initial technical reference is the Leonida project lineage:
+NOVA Runtime currently includes the upstream engine as a Git submodule at `engine/leonida`:
 
+- Active continuation: https://github.com/ubiquitarianism/leonida
+- Pinned commit: https://github.com/ubiquitarianism/leonida/commit/b9320a118d46b24de665e30e577425c131b4a2ee
 - Original project: https://github.com/ItsNotRexed/Leonida
-- Continuation: https://github.com/ubiquitarianism/leonida
-- Reviewed mirror/continuation: https://github.com/ExCorvus/leonida
+- Earlier mirror reviewed during bootstrap: https://github.com/ExCorvus/leonida
 
-The original project is credited to **NotRexed and its contributors**. The continuation identifies **ubiquitarianism** as its maintainer. The ExCorvus repository describes itself as a continuation/mirror of that work.
+The original project is credited to **NotRexed and its contributors**. The active continuation is maintained under the **ubiquitarianism** GitHub account. The upstream README describes the work as a continuation of the original Leonida project.
 
-The reviewed ExCorvus snapshot is commit `8eee35cfdccc613a1f7a10a5539d5bd3b25038ba`.
+The pinned engine repository reports the **GNU General Public License v3.0**. The full license text is included in this repository as `LICENSE`. The submodule retains its own source history, copyright notices, and third-party files. NOVA does not claim authorship of upstream code.
 
-The upstream repository reports the **GNU General Public License v3.0**. The upstream license text is included in this repository as `LICENSE`. Any imported or adapted code must retain applicable notices and comply with that license. This bootstrap repository currently contains no copied upstream source code.
+## Nested dependencies
 
-## Other dependencies
+The upstream engine declares `third_party/rpf9-explorer` as a nested Git submodule. Its own license and notices are maintained in that repository. Initialize submodules recursively and consult the nested project's license before redistributing a combined source archive or binary.
 
-A dependency-by-dependency notice list will be added when upstream source and submodules are integrated. No dependency license or authorship is inferred in advance.
+## NOVA-owned additions
+
+The NOVA CLI, documentation, tests, and future user-facing layer are separate additions. They are maintained within the repository's GPL-3.0 license baseline. More dependency notices will be added as additional components are introduced.
