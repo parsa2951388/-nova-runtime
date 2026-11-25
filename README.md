@@ -1,11 +1,20 @@
 # NOVA Runtime
 
+<p align="center">
+  <img src="assets/nova-mark.svg" alt="NOVA Runtime" width="430">
+</p>
+
+
 **An independent identity and developer experience for a PC runtime research project.**
 
 NOVA Runtime is being built around the open-source Leonida engine lineage. NOVA keeps its own documentation, command-line entry point, engineering roadmap, and future user experience separate from the upstream engine.
 
 > [!WARNING]
 > **NOVA is not a playable game or finished port.** The engine is pinned as a Git submodule. NOVA has not yet produced or verified its own end-to-end build.
+
+## Identity
+
+See [the NOVA brand guide](docs/BRAND.md) for the logo, palette, and interface principles.
 
 ## Repository layout
 
