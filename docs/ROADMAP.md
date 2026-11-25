@@ -1,46 +1,56 @@
 # NOVA Runtime roadmap
 
-This roadmap is staged. A stage is not complete until its evidence and tests are recorded.
+A stage is complete only when its evidence is recorded. Upstream functionality is not automatically a NOVA test result.
 
 ## Stage 0 — Repository bootstrap
 
-- [x] Establish the NOVA Runtime identity and project scope.
-- [x] Record the upstream lineage and license baseline.
-- [x] Document data-handling and protection boundaries.
-- [x] Record the current state honestly: no imported code and no playable build.
+- [x] Establish the NOVA Runtime identity and scope.
+- [x] Record project lineage and GPL-3.0 baseline.
+- [x] Document local-only data handling and protection boundaries.
+- [x] Record the initial repository state accurately.
 
-## Stage 1 — Source integration
+## Stage 1 — Engine integration
 
-- [ ] Select and pin an exact upstream revision.
-- [ ] Import source without losing existing authorship and commit attribution where technically possible.
-- [ ] Preserve the upstream license, copyright notices, submodule declarations, and third-party notices.
-- [ ] Audit the imported tree for game data, generated assets, binaries, secrets, and unsafe network behavior.
-- [ ] Establish a repeatable update procedure for upstream changes.
+- [x] Select the active continuation repository, not the older ExCorvus mirror.
+- [x] Pin an exact upstream commit.
+- [x] Add the engine as `engine/leonida` Git submodule, retaining the original repository and history.
+- [x] Record nested submodule requirements and update procedure.
+- [ ] Clone the repository recursively in a clean environment and verify every submodule resolves.
+- [ ] Run the upstream no-game-data scanner against the pinned engine checkout.
+- [ ] Audit dependency, workflow, and build behavior before NOVA-specific engine patches.
 
-## Stage 2 — Baseline reproduction
+## Stage 2 — NOVA developer entry point
 
-- [ ] Identify prerequisites and supported build environments.
-- [ ] Run source-level compile, unit, semantic, and runtime tests that do not require proprietary game data.
-- [ ] Record toolchain versions and exact commands.
-- [ ] Verify that no game-derived artifacts are present in the repository.
-- [ ] Produce a reproducible status report before making functional changes.
+- [x] Add the NOVA CLI with `doctor`, `engine-help`, and `build` forwarding.
+- [x] Add unit tests for version parsing and toolchain checks.
+- [x] Add CI checks for the submodule pin and upstream data scanner.
+- [ ] Run CI on GitHub and fix any failures.
+- [ ] Reproduce the documented upstream build prerequisites on a clean Windows machine.
+- [ ] Record build commands, exact tool versions, hardware, GPU, and driver.
 
-## Stage 3 — NOVA-specific engineering
+## Stage 3 — NOVA experience
 
-- [ ] Add NOVA branding to project metadata, documentation, setup flow, and user-facing diagnostics.
-- [ ] Keep brand/UI changes separated from low-level translation and runtime semantics.
-- [ ] Improve setup validation, error messages, resumable builds, and diagnostic bundles.
-- [ ] Add a compatibility matrix based on actual test evidence.
-- [ ] Add regression tests for every core behavior change.
+- [ ] Create the NOVA setup and first-run experience without changing upstream engine semantics.
+- [ ] Add a clearer compatibility report and diagnostics bundle.
+- [ ] Add resumable setup guidance and storage planning for separate work/output drives.
+- [ ] Add accessible interface design and localization strategy.
+- [ ] Add regression tests for every NOVA-owned feature.
 
-## Stage 4 — Packaging and release readiness
+## Stage 4 — Engineering changes
 
-- [ ] Define a clean build and packaging process.
-- [ ] Ensure releases contain only project code and permitted dependencies—not game files, extracted assets, keys, or saves.
-- [ ] Verify license and third-party notices in source archives and releases.
-- [ ] Run security and dependency checks.
-- [ ] Publish only when supported functionality and limitations are accurately documented.
+- [ ] Identify a narrow, testable upstream improvement and verify it is not already claimed upstream.
+- [ ] Keep NOVA patches isolated from upstream code where possible.
+- [ ] Add regression tests and measurable evidence for each change.
+- [ ] Submit upstream fixes when they are generally useful and compatible with upstream contribution rules.
+
+## Stage 5 — Release readiness
+
+- [ ] Reproduce an end-to-end run on supported hardware.
+- [ ] Document known limitations and compatibility by GPU/driver.
+- [ ] Verify all license and third-party notices in source archives and releases.
+- [ ] Ensure releases contain no proprietary game files, keys, extracted assets, or saves.
+- [ ] Publish only claims supported by repeatable tests.
 
 ## Release gate
 
-NOVA must not be described as playable or production-ready until an end-to-end run has been independently reproduced and its results, hardware, driver, and known limitations are documented. No release date is promised.
+NOVA must not be described as playable or production-ready until an end-to-end run has been reproduced and documented. The currently pinned upstream revision reports reaching the world phase but does not report a verified first world frame or playable story mode.
