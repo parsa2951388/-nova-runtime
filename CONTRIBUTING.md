@@ -23,7 +23,8 @@ NOVA-owned code and documentation live in this repository. The original engine l
 
 1. Keep each pull request focused on one change.
 2. Update tests and documentation with behavior changes.
-3. Run `python -m unittest discover -s tests -v`.
+3. Run `python -m unittest discover -s tests -v
+python -m compileall -q nova.py nova_gui.py scripts tests`.
 4. Run `python scripts/verify_upstream.py` after submodule changes.
 5. For an upstream pin update, review the intervening commits, source status, nested dependencies, and licenses before moving the gitlink.
 6. Record exactly what was tested. Do not label upstream-reported behavior as NOVA-tested.
