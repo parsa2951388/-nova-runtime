@@ -1,0 +1,3 @@
+[submodule "engine/leonida"]
+	path = engine/leonida
+	url = https://github.com/ubiquitarianism/leonida.git
