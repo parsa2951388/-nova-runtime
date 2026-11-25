@@ -6,7 +6,7 @@ The engine and one of its dependencies are Git submodules. Use a recursive clone
 
 ```sh
 git clone --recurse-submodules https://github.com/parsa2951388/-nova-runtime.git
-cd -nova-runtime
+cd ./-nova-runtime
 ```
 
 For an existing checkout:
