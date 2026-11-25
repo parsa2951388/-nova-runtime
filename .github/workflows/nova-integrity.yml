@@ -1,0 +1,45 @@
+name: NOVA integrity
+
+on:
+  push:
+    branches: [main, "nova/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: nova-integrity-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out NOVA and pinned engine
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test NOVA-owned tooling
+        run: |
+          python -m compileall -q nova.py scripts tests
+          python -m unittest discover -s tests -v
+
+      - name: Verify exact upstream pin
+        run: python scripts/verify_upstream.py
+
+      - name: Scan upstream checkout for game data
+        working-directory: engine/leonida
+        run: python -I scripts/check_no_game_data.py

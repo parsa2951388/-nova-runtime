@@ -1,64 +1,68 @@
 # NOVA Runtime
 
-**A new identity for an independent PC runtime research project.**
+**An independent identity and developer experience for a PC runtime research project.**
 
-NOVA Runtime is the working brand for a community engineering project exploring a native Windows/Linux PC runtime path for a legally obtained, locally readable Xbox Series game package. Its initial technical reference is the Leonida project.
+NOVA Runtime is being built around the open-source Leonida engine lineage. NOVA keeps its own documentation, command-line entry point, engineering roadmap, and future user experience separate from the upstream engine.
 
 > [!WARNING]
-> **This repository is currently a documentation bootstrap, not a playable port.** The upstream codebase has not yet been imported into this repository. There are no NOVA binaries, installers, launchers, or compatibility claims at this stage.
+> **NOVA is not a playable game or finished port.** The engine is pinned as a Git submodule. NOVA has not yet produced or verified its own end-to-end build.
 
-## Project direction
+## Repository layout
 
-The aim is to build a clearly branded and maintainable project around the upstream technical foundation, with an independent identity, better onboarding, diagnostics, build orchestration, testing, and eventually a polished desktop experience.
+- `engine/leonida/` — canonical upstream engine, pinned as a Git submodule.
+- `nova.py` — NOVA command-line front end. It checks the local toolchain and delegates engine operations without silently modifying upstream behavior.
+- `docs/` — NOVA architecture, development instructions, roadmap, and upstream pin.
+- `tests/` — tests for NOVA-owned tooling.
+- `THIRD_PARTY_NOTICES.md` and `LICENSE` — provenance and license information.
 
-Planned engineering areas:
+Clone with submodules so the engine is present:
 
-- Local package validation and reproducible build orchestration.
-- RDNA2 shader translation to SPIR-V for Vulkan.
-- A PC runtime and console-API compatibility shims.
-- Local-only asset processing from the user's own readable files.
-- Automated regression tests, GPU diagnostics, and clear compatibility reporting.
-- A distinct NOVA setup experience, documentation, and visual identity.
+```sh
+git clone --recurse-submodules https://github.com/parsa2951388/-nova-runtime.git
+cd -nova-runtime
+python nova.py doctor
+```
 
-These are project goals, not claims that the features are already implemented here.
+If the repository was cloned without submodules:
 
-## Current status
+```sh
+git submodule update --init --recursive
+```
 
-| Area | Status |
-|---|---|
-| NOVA project repository | Created |
-| Branding and project documentation | Bootstrap in progress |
-| Upstream code integration | Not started |
-| Reproducible build verification | Not started |
-| NOVA runtime executable | Does not exist yet |
-| Playable game support | Not available / not claimed |
+## First commands
 
-See [the roadmap](docs/ROADMAP.md) and [architecture notes](docs/ARCHITECTURE.md).
+```sh
+python nova.py doctor          # inspect local prerequisites and available disk space
+python nova.py engine-help     # show the pinned engine's command-line help
+python nova.py build --find    # ask the engine to look for a local game package
+python nova.py build --check   # validate a package; do not build
+```
 
-## Technical starting point and attribution
+The `build` command forwards its remaining arguments to the pinned upstream `make_game.py`. The engine's own documentation remains authoritative for all build flags.
 
-The initial technical reference is [ExCorvus/leonida](https://github.com/ExCorvus/leonida), a continuation/mirror in the Leonida project lineage. The original project is credited to **NotRexed and its contributors**; the continuation is associated with **ubiquitarianism**. The reviewed ExCorvus snapshot is:
+## Verified upstream baseline
 
-- Repository: https://github.com/ExCorvus/leonida
-- Reviewed commit: [`8eee35cfdccc`](https://github.com/ExCorvus/leonida/commit/8eee35cfdccc613a1f7a10a5539d5bd3b25038ba)
-- License identified by the upstream repository: **GNU GPL v3.0**
+NOVA currently pins [ubiquitarianism/leonida](https://github.com/ubiquitarianism/leonida) at commit [`b9320a118d46`](https://github.com/ubiquitarianism/leonida/commit/b9320a118d46b24de665e30e577425c131b4a2ee), dated **25 November 2026**. This is the active continuation; the previously reviewed `ExCorvus/leonida` repository is an older mirror and is not the pinned source.
 
-No upstream source files have been copied into this bootstrap commit. When upstream code is integrated, its copyright notices, license terms, and third-party notices must be retained. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The upstream README at that commit reports that the game reaches the world phase after the story load on native Windows and Linux/Proton, but **a first world frame has not been verified**. Story mode is not reported as playable. This is upstream-reported status, not a NOVA test result. See [UPSTREAM.md](docs/UPSTREAM.md).
 
-## Non-negotiable data and safety rules
+## Build prerequisites and storage
 
-- Use only a game copy and files that the user is legally entitled to access and that are already readable locally.
-- Do not provide, download, distribute, or commit game executables, archives, keys, decrypted files, extracted assets, generated game shaders, saves, or other proprietary game data.
-- Do not implement key extraction, decryption, DRM circumvention, or protection bypasses. If a required input is protected or encrypted, stop and document the limitation.
-- Do not connect to Xbox Live, Rockstar services, or other game services.
-- Keep generated assets, build output, logs, and user data on the user's machine.
+The upstream currently documents Windows 10/11 x64 as its primary build environment, Python 3.12+, .NET 8 SDK, Vulkan SDK tools (`spirv-as` and `spirv-val`), LLVM 21+ with the AMDGPU target for `llvm-mc`, and Visual Studio 2022 with Desktop C++ tools and Windows SDK 10.0.26100 or newer.
 
-These rules follow the upstream project's documented contributor constraints and are repeated here so they remain explicit in the NOVA repository.
+The upstream estimates about **400 GiB** of work space for a full build. Its reduced `check,shaders,runtime` path is estimated at about **30 GiB**; the asset-export stage accounts for roughly another **370 GiB**. Work and output directories can be placed on separate drives. Review [DEVELOPMENT.md](docs/DEVELOPMENT.md) and the upstream README before starting a build.
 
-## License
+## Project rules
 
-This repository includes the GNU General Public License v3.0 text as the intended license baseline for the project. Any imported or adapted upstream code remains subject to its applicable notices and license. See [LICENSE](LICENSE).
+- Use only a game package the user is legally entitled to access and that is already readable locally.
+- Never commit or distribute game executables, archives, keys, extracted assets, generated shaders, saves, or other proprietary game data.
+- Do not implement key extraction, decryption, DRM circumvention, or protection bypasses. Stop and document the limitation if a required input is protected.
+- Keep local build products, logs, and generated assets outside version control.
+- Preserve upstream attribution, GPL notices, submodule provenance, and third-party licenses.
+- Distinguish upstream-reported functionality from functionality NOVA has actually built and tested.
 
-## Disclaimer
+## License and attribution
 
-NOVA Runtime is an independent, unofficial community project. It is not affiliated with, endorsed by, or sponsored by Rockstar Games, Take-Two Interactive, Microsoft, or Xbox. All product names and trademarks belong to their respective owners.
+The upstream engine is distributed under **GNU GPL v3.0**. The license text and project lineage are preserved here. NOVA's own additions are developed within that license baseline; upstream authorship is not claimed as NOVA authorship. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+NOVA is an independent, unofficial community project. It is not affiliated with or endorsed by Rockstar Games, Take-Two Interactive, Microsoft, or Xbox. Product names and trademarks belong to their respective owners.
