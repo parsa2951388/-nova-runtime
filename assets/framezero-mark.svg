@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="240" viewBox="0 0 980 240" role="img" aria-labelledby="title desc">
+  <title id="title">FRAMEZERO LAB</title>
+  <desc id="desc">Original geometric Framezero Lab mark and wordmark</desc>
+  <defs>
+    <linearGradient id="ion" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#57E5FF"/>
+      <stop offset="1" stop-color="#4A8DFF"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9D8BFF"/>
+      <stop offset="1" stop-color="#6555DD"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="968" height="228" rx="34" fill="#080E1C"/>
+  <rect x="18" y="18" width="944" height="204" rx="26" fill="none" stroke="#20344C" stroke-width="2"/>
+  <g transform="translate(52 44)">
+    <path d="M76 0 152 44v88l-76 44L0 132V44Z" fill="#101D31" stroke="#31506F" stroke-width="3"/>
+    <path d="M37 52h31v77H37z" fill="url(#ion)"/>
+    <path d="M68 52h31l18 23v54H86V86H68z" fill="url(#violet)"/>
+    <path d="M37 129h80v23H37z" fill="#57E5FF" opacity=".92"/>
+    <circle cx="76" cy="88" r="8" fill="#F2F6FF"/>
+  </g>
+  <text x="250" y="119" fill="#F2F6FF" font-family="Segoe UI, Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="2">FRAMEZERO</text>
+  <text x="254" y="168" fill="#57D9F5" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="10">LAB / RUNTIME RESEARCH</text>
+</svg>
