@@ -1,60 +1,60 @@
-# NOVA Runtime architecture
+# FRAMEZERO LAB architecture
 
-## Repository boundary
+## Purpose
 
-NOVA keeps its own user-facing layer at the repository root and pins the upstream implementation at:
+FRAMEZERO is a developer workbench for local runtime and graphics-compatibility research. It owns diagnostics, orchestration, a desktop setup experience, tests, documentation, and repository-integrity checks. It does not claim to be an independent implementation of the upstream game engine.
 
-- Path: `engine/leonida/`
-- Remote: https://github.com/ubiquitarianism/leonida.git
-- Pinned commit: `b9320a118d46b24de665e30e577425c131b4a2ee`
-- Branch used for future upstream updates: `main`
+## Repository boundaries
 
-The submodule preserves the upstream repository's own commit history and attribution. Do not copy the engine into a second source tree or change its pinned revision without updating [UPSTREAM.md](UPSTREAM.md), the submodule pointer, and the roadmap.
+- FRAMEZERO-owned files: **framezero.py**, **framezero_gui.py**, **scripts/**, **tests/**, **docs/**, assets, and repository automation.
+- External engine dependency: **engine/leonida/**, pinned as a Git submodule at the exact commit recorded in the root Git tree.
+- Nested dependency: **engine/leonida/third_party/rpf9-explorer**, also initialized recursively through Git.
 
-## NOVA-owned layer
+The submodule preserves the upstream repository's commit history, licence, authorship, and notices. Do not copy the engine into another source tree or represent upstream implementation as FRAMEZERO-authored work.
 
-`nova.py` is a deliberately thin Python front end:
+## FRAMEZERO command path
 
-1. `doctor` reports whether the local tools, engine checkout, and disk budget meet the documented prerequisites.
-2. `engine-help` shows the pinned engine's own help.
-3. `build` forwards the supplied arguments to `engine/leonida/make_game.py` using the current Python interpreter and isolated mode.
+1. **status** reports the local project identity, committed engine pin, and initialization state.
+2. **doctor** checks local tools, versions, submodules, and repository-volume capacity.
+3. **verify** validates the engine Git link, expected remotes, and every recursive submodule state.
+4. **engine-help** and **build** invoke the pinned upstream make_game.py through the current Python interpreter in isolated mode.
+5. The desktop console calls the same CLI; it does not duplicate engine behavior.
 
-The wrapper must not reimplement shader translation, package parsing, runtime loading, or graphics compatibility. Those remain upstream engine responsibilities unless a separately reviewed NOVA patch is introduced.
+The command wrapper must not reimplement package parsing, shader translation, runtime loading, or graphics compatibility. Those are external-engine responsibilities unless a separately reviewed, lawful, and technically justified implementation is developed.
 
-## Upstream engine pipeline
+## Desktop process model
 
-As documented by the pinned upstream revision, the broad pipeline is:
+The Tk main thread owns widget state and the child-process handle. It creates the process before enabling the Stop control, preventing a race where the user could request cancellation before the process handle existed. A worker thread reads stdout and sends events through a thread-safe queue. The Tk event loop alone updates widgets. Stop sends a normal termination request and schedules a bounded forced-stop check.
 
-1. **Local package check** — identify and validate the expected package/version already readable on the user's machine.
-2. **Shader pipeline** — carve and disassemble RDNA2 programs, translate them to SPIR-V, and validate the result.
-3. **Local asset processing** — process models, textures, and audio from the local package into working/output folders.
-4. **Runtime loader** — load the executable image and resolve imports through compatibility shims.
-5. **Graphics compatibility** — map the console-facing D3D12-style interface to Vulkan-backed operations.
-6. **Testing and diagnostics** — semantic regression tests, runtime tests, shader/pipeline checks, and GPU-specific diagnostics.
+No GUI worker thread may mutate Tk widgets directly.
 
-These are upstream architectural responsibilities. Their presence in the submodule is not evidence that NOVA has reproduced or validated the complete pipeline.
+## Upstream pipeline context
 
-## External dependency
+The pinned engine describes the following broad responsibilities:
 
-The upstream repository declares `third_party/rpf9-explorer` as a nested Git submodule. Always use recursive submodule initialization:
+1. Local package identification and validation.
+2. RDNA2 shader disassembly and SPIR-V translation/validation.
+3. Local processing of models, textures, and audio.
+4. Executable loading and import shims.
+5. Console-facing graphics compatibility through Vulkan.
+6. Runtime, shader, and GPU-specific testing.
 
-```sh
-git submodule update --init --recursive
-```
+The list describes upstream architecture, not independently verified FRAMEZERO capabilities.
 
 ## Data boundary
 
-- Game packages and all files generated from them stay on the user's machine.
-- No game archives, executable, keys, shader binaries, textures, models, audio, videos, saves, or reports quoting game data may enter commits, issues, pull requests, tests, or releases.
-- If a required format is encrypted or protected, document that limitation and stop.
-- No connection to Xbox Live, Rockstar services, or other game services is part of this project.
+- User-owned game packages and generated outputs remain local.
+- Never commit or distribute game archives, executables, keys, extracted assets, generated shaders, textures, models, audio, video, saves, or proprietary logs.
+- Never implement key extraction, decryption, protection bypass, or DRM circumvention.
+- Do not connect to Xbox Live, Rockstar services, or any game service.
+- If a required input is protected or unavailable through lawful means, document the limitation and stop.
 
-## Evidence standard
+## Evidence labels
 
-NOVA documentation must label each result as one of:
+All reports and status pages must distinguish:
 
-- **Upstream-reported** — stated by the pinned upstream project.
-- **NOVA-tested** — reproduced from a documented NOVA checkout and toolchain.
-- **Hypothesis** — not yet measured or verified.
+- **FRAMEZERO-tested** — reproduced by this repository's tests or documented local run.
+- **Upstream-reported** — stated by the external engine maintainers.
+- **Unverified** — not yet measured.
 
-Never turn an upstream claim into a NOVA test result by rewording it.
+Never reword an upstream claim as a FRAMEZERO test result.

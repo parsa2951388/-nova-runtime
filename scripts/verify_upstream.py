@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify that the checked-out engine matches NOVA's committed Git submodule pin."""
+"""Verify the pinned engine and every recursive Git submodule."""
 from __future__ import annotations
 
 import subprocess
@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ENGINE = ROOT / "engine" / "leonida"
 EXPECTED_URL = "https://github.com/ubiquitarianism/leonida.git"
+EXPECTED_NESTED_URL = "https://github.com/breadbbbb/rpf9-explorer"
 
 
 def run_git(arguments: list[str], cwd: Path = ROOT) -> str:
@@ -24,7 +25,24 @@ def run_git(arguments: list[str], cwd: Path = ROOT) -> str:
     if result.returncode:
         message = result.stderr.strip() or f"git {' '.join(arguments)} failed"
         raise RuntimeError(message)
-    return result.stdout.strip()
+    return result.stdout.rstrip("\r\n")
+
+
+def verify_recursive_submodules() -> list[str]:
+    output = run_git(["submodule", "status", "--recursive"])
+    rows = [line for line in output.splitlines() if line.strip()]
+    if not rows:
+        raise RuntimeError("Git returned no submodule status entries.")
+    for line in rows:
+        marker = line[0]
+        if marker != " ":
+            state = {
+                "-": "not initialized",
+                "+": "checked out at a different commit",
+                "U": "merge conflict",
+            }.get(marker, "unexpected state")
+            raise RuntimeError(f"Submodule {state}: {line[1:].strip()}")
+    return rows
 
 
 def main() -> int:
@@ -48,17 +66,27 @@ def main() -> int:
                 f"Submodule checkout mismatch: expected {pinned_sha}, found {checked_out_sha}"
             )
 
-        nested = run_git(
+        nested_url = run_git(
             ["config", "--file", ".gitmodules", "--get", "submodule.third_party/rpf9-explorer.url"],
             cwd=ENGINE,
         )
+        if nested_url != EXPECTED_NESTED_URL:
+            raise RuntimeError(f"Unexpected nested dependency URL: {nested_url}")
+
+        nested_dir = ENGINE / "third_party" / "rpf9-explorer"
+        if not nested_dir.is_dir() or not any(nested_dir.iterdir()):
+            raise RuntimeError("Nested rpf9-explorer dependency is not initialized.")
+
+        rows = verify_recursive_submodules()
         print(f"Engine URL: {url}")
         print(f"Engine pin: {pinned_sha}")
-        print(f"Nested dependency: {nested}")
-        print("Upstream pin verification passed.")
+        print(f"Nested dependency: {nested_url}")
+        for row in rows:
+            print(f"Submodule: {row.strip()}")
+        print("FRAMEZERO repository verification passed.")
         return 0
     except (OSError, RuntimeError) as exc:
-        print(f"Upstream pin verification failed: {exc}", file=sys.stderr)
+        print(f"FRAMEZERO repository verification failed: {exc}", file=sys.stderr)
         return 1
 
 

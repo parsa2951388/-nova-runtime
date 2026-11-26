@@ -2,21 +2,25 @@
 
 ## Leonida engine
 
-NOVA Runtime currently includes the upstream engine as a Git submodule at `engine/leonida`:
+FRAMEZERO references the upstream engine through a Git submodule at engine/leonida:
 
 - Active continuation: https://github.com/ubiquitarianism/leonida
 - Pinned commit: https://github.com/ubiquitarianism/leonida/commit/b9320a118d46b24de665e30e577425c131b4a2ee
 - Original project: https://github.com/ItsNotRexed/Leonida
 - Earlier mirror reviewed during bootstrap: https://github.com/ExCorvus/leonida
 
-The original project is credited to **NotRexed and its contributors**. The active continuation is maintained under the **ubiquitarianism** GitHub account. The upstream README describes the work as a continuation of the original Leonida project.
+The upstream README identifies the project as a continuation of NotRexed's Leonida project. Credit for the original work and the commit history belongs to NotRexed and the upstream contributors. The current continuation is maintained under the ubiquitarianism GitHub account. FRAMEZERO does not claim authorship or maintainership of that engine.
 
-The pinned engine repository reports the **GNU General Public License v3.0**. The full license text is included in this repository as `LICENSE`. The submodule retains its own source history, copyright notices, and third-party files. NOVA does not claim authorship of upstream code.
+The pinned upstream repository identifies its licence as GNU GPL v3.0. This repository retains the GPL-3.0 baseline and a copy of the licence text. Consult the current upstream licence and notices before redistributing source or binaries.
 
 ## Nested dependencies
 
-The upstream engine declares `third_party/rpf9-explorer` as a nested Git submodule. Its own license and notices are maintained in that repository. Initialize submodules recursively and consult the nested project's license before redistributing a combined source archive or binary.
+The upstream engine declares third_party/rpf9-explorer as a nested Git submodule at https://github.com/breadbbbb/rpf9-explorer. Its own licence and notices remain in that repository. Initialize recursive submodules and consult the nested project's current licence before redistribution.
 
-## NOVA-owned additions
+## FRAMEZERO-owned additions
 
-The NOVA CLI, documentation, tests, and future user-facing layer are separate additions. They are maintained within the repository's GPL-3.0 license baseline. More dependency notices will be added as additional components are introduced.
+FRAMEZERO's CLI, desktop console, diagnostics, documentation, tests, and brand assets are separate additions, maintained under this repository's GPL-3.0 baseline. Additional third-party notices must be added whenever new dependencies are introduced.
+
+## Trademarks and affiliation
+
+FRAMEZERO LAB is an independent, unofficial research workbench. It is not affiliated with or endorsed by Rockstar Games, Take-Two Interactive, Microsoft, Xbox, NotRexed, or the upstream Leonida maintainers. Product names and trademarks belong to their respective owners.

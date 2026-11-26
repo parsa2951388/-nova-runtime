@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose an improvement to FRAMEZERO-owned tooling.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: policy
+    attributes:
+      label: Project boundary
+      options:
+        - label: This proposal does not require game files, keys, decryption, DRM circumvention, or proprietary assets.
+          required: true
