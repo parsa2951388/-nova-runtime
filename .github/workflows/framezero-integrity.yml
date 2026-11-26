@@ -1,0 +1,73 @@
+name: FRAMEZERO integrity
+
+on:
+  push:
+    branches: [main, "rebrand/**", "feature/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: framezero-integrity-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Python tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source and recursive dependencies
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile FRAMEZERO tooling
+        run: python -m compileall -q framezero.py framezero_gui.py nova.py nova_gui.py scripts tests
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+  integrity:
+    name: Recursive source and data integrity
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source and recursive dependencies
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify exact upstream and nested submodule pins
+        run: python scripts/verify_upstream.py
+
+      - name: Scan FRAMEZERO-owned tracked files
+        run: python -I scripts/check_no_game_data.py
+
+      - name: Scan pinned upstream checkout
+        working-directory: engine/leonida
+        run: python -I scripts/check_no_game_data.py
