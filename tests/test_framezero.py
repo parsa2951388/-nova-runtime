@@ -73,5 +73,37 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(result, 1)
 
 
+
+
+class RecursiveSubmoduleTests(unittest.TestCase):
+    def test_all_initialized_submodules_are_accepted(self):
+        from scripts.verify_upstream import verify_recursive_submodules
+
+        sample = " abc123 engine/leonida\n def456 engine/leonida/third_party/rpf9-explorer"
+        with patch("scripts.verify_upstream.run_git", return_value=sample):
+            rows = verify_recursive_submodules()
+        self.assertEqual(len(rows), 2)
+
+    def test_missing_submodule_is_rejected(self):
+        from scripts.verify_upstream import verify_recursive_submodules
+
+        with patch("scripts.verify_upstream.run_git", return_value="-abc123 engine/leonida"):
+            with self.assertRaisesRegex(RuntimeError, "not initialized"):
+                verify_recursive_submodules()
+
+    def test_mismatched_submodule_is_rejected(self):
+        from scripts.verify_upstream import verify_recursive_submodules
+
+        with patch("scripts.verify_upstream.run_git", return_value="+abc123 engine/leonida"):
+            with self.assertRaisesRegex(RuntimeError, "different commit"):
+                verify_recursive_submodules()
+
+    def test_conflicted_submodule_is_rejected(self):
+        from scripts.verify_upstream import verify_recursive_submodules
+
+        with patch("scripts.verify_upstream.run_git", return_value="Uabc123 engine/leonida"):
+            with self.assertRaisesRegex(RuntimeError, "conflict"):
+                verify_recursive_submodules()
+
 if __name__ == "__main__":
     unittest.main()
