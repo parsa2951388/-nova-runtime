@@ -25,7 +25,7 @@ def run_git(arguments: list[str], cwd: Path = ROOT) -> str:
     if result.returncode:
         message = result.stderr.strip() or f"git {' '.join(arguments)} failed"
         raise RuntimeError(message)
-    return result.stdout.strip()
+    return result.stdout.rstrip("\r\n")
 
 
 def verify_recursive_submodules() -> list[str]:
