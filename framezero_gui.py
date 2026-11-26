@@ -15,15 +15,15 @@ ROOT = Path(__file__).resolve().parent
 FRAMEZERO_SCRIPT = ROOT / "framezero.py"
 UPSTREAM_PIN = "b9320a118d46"
 PALETTE = {
-    "midnight": "#0B1020",
-    "carbon": "#141C2E",
-    "panel": "#1B2740",
-    "cyan": "#45D6FF",
-    "violet": "#8B7CFF",
-    "amber": "#FFCA78",
+    "midnight": "#080E1C",
+    "carbon": "#101D31",
+    "panel": "#192A42",
+    "cyan": "#57D9F5",
+    "violet": "#9D8BFF",
+    "amber": "#FFC96D",
     "white": "#F2F6FF",
     "slate": "#9AA8BE",
-    "green": "#6DE0B1",
+    "green": "#70DEB0",
     "red": "#FF7F89",
 }
 
