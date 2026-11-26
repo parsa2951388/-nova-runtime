@@ -2,101 +2,87 @@
 
 ## 1. Clone the complete source
 
-The engine and one of its dependencies are Git submodules. Use a recursive clone:
+The engine and one of its dependencies are Git submodules. Clone recursively:
 
-```sh
-git clone --recurse-submodules https://github.com/parsa2951388/-nova-runtime.git
-cd ./-nova-runtime
-```
+~~~sh
+git clone --recurse-submodules https://github.com/parsa2951388/framezero-lab.git
+cd framezero-lab
+~~~
 
 For an existing checkout:
 
-```sh
+~~~sh
 git submodule update --init --recursive
-```
+python framezero.py verify
+~~~
 
-Confirm the pinned engine revision:
+## 2. Prerequisites
 
-```sh
-python scripts/verify_upstream.py
-```
+The pinned upstream README lists:
 
-## 2. Prerequisites documented by upstream
-
-The upstream README currently documents:
-
-- Your own Xbox Series package, version 1.0.2.1, with files already readable on disk.
-- Windows 10/11 x64 as the primary build environment.
-- Python 3.12 or newer.
+- A lawfully accessed local package that is already readable on disk, if using an upstream package workflow.
+- Windows 10/11 x64 as the primary runtime build environment.
+- Python 3.12+.
 - .NET 8 SDK.
-- Vulkan SDK, including `spirv-as` and `spirv-val`.
-- LLVM 21 or newer with the AMDGPU target for `llvm-mc`. The official Windows LLVM build does not include this target; upstream documents a build helper, a conda-forge package, or a WSL installation.
-- Visual Studio 2022 with the Desktop development with C++ workload and Windows SDK 10.0.26100 or newer for the runtime stage.
-- `ffmpeg` is optional for ordinary audio export, but required for the optional WAV conversion.
+- Vulkan SDK with spirv-as and spirv-val.
+- LLVM 21+ with the AMDGPU target for llvm-mc.
+- Visual Studio 2022 with Desktop development with C++ and Windows SDK 10.0.26100+ for the runtime stage.
+- ffmpeg optional for selected audio conversions.
 
-The upstream reports that some tools and diagnostics also work on Linux and macOS; that is not equivalent to full native runtime support. Follow the platform-specific upstream documentation.
+See the upstream documentation for current tool versions and platform-specific instructions. FRAMEZERO does not provide game files, keys, or protection circumvention.
 
-## 3. Check the machine
+## 3. Check the local environment
 
-```sh
-python nova.py doctor
-```
+~~~sh
+python framezero.py doctor
+python framezero.py status
+python framezero.py verify
+~~~
 
-The doctor is a local toolchain check. It does not locate, open, inspect, or modify game files.
+The doctor checks tool availability and version information, engine and nested submodule initialization, the exact root Git link, and free space on the repository volume. It does not inspect game packages.
 
-## 4. Use the engine through NOVA
+## 4. Desktop console
 
-```sh
-python nova.py engine-help
-python nova.py build --find
-python nova.py build --pick
-python nova.py build --check
-```
+~~~sh
+python framezero_gui.py
+~~~
 
-To pass a full explicit build command, the remainder of the command is forwarded unchanged:
+The console provides overview, diagnostics, package validation, build profiles, output streaming, and stop/force-stop controls. Tkinter is part of the Python standard library where the selected Python distribution includes Tk support.
 
-```powershell
-python nova.py build --game "D:\path\to\your\package" --out "D:\Games\NOVA" --work "E:\nova-work"
-```
+## 5. Delegate upstream commands
 
-All supported flags and stage behavior are defined by the pinned upstream `make_game.py` and README. NOVA does not override them.
+~~~sh
+python framezero.py engine-help
+python framezero.py build --find
+python framezero.py build --check
+~~~
 
-## 5. Storage planning
+The remainder of a build command is forwarded to the pinned upstream make_game.py. The upstream README and help output define every accepted option.
 
-The upstream estimates approximately:
+## 6. Storage planning
 
-- **400 GiB** of work space for the full build.
-- **30 GiB** for the reduced `check,shaders,runtime` stages.
-- Around **370 GiB** for the optional asset-export stage.
+The pinned upstream documentation estimates approximately 30 GiB for its reduced check/shaders/runtime stages and approximately 400 GiB for the full pipeline. Asset export accounts for a substantial portion of the full estimate. These numbers are not guarantees and may change upstream.
 
-The `--work` and `--out` paths can be placed on drives separate from the package. Check the upstream README for its current storage layout before starting; the space estimate is an upstream measurement, not a guarantee for every machine.
+Select work and output directories only after checking the capacity of the actual target volumes. The doctor reports the repository volume only; it cannot predict every upstream intermediate file.
 
-## 6. Tests
+## 7. Tests
 
-NOVA-owned tests:
-
-```sh
+~~~sh
+python -m compileall -q framezero.py framezero_gui.py nova.py nova_gui.py scripts tests
 python -m unittest discover -s tests -v
 python scripts/verify_upstream.py
-```
+python -I scripts/check_no_game_data.py
+~~~
 
-The upstream documents its own test commands in `engine/leonida/AGENTS.md` and `engine/leonida/CONTRIBUTING.md`. Run those from the upstream submodule directory. Do not commit game data or files generated from a local game package.
+The CI workflow repeats Python tests on Linux and Windows and performs recursive submodule and data-integrity checks on Linux.
 
-## 7. Upstream updates
+## 8. Upstream updates
 
-The submodule is pinned to a specific commit. To review a newer upstream main revision:
+Do not move the engine pin automatically. Review the upstream repository, release notes, commit history, nested dependencies, licence changes, and current project status first. Then update the Git submodule pointer deliberately and update docs/UPSTREAM.md in the same change.
 
-```sh
+~~~sh
 git -C engine/leonida fetch origin main
 git -C engine/leonida log --oneline --decorate -10 origin/main
-```
+~~~
 
-After reviewing the changes and verifying compatibility, update the submodule pointer deliberately:
-
-```sh
-git -C engine/leonida checkout <reviewed-commit>
-git add engine/leonida
-git commit -m "build: update pinned Leonida engine"
-```
-
-Update [UPSTREAM.md](UPSTREAM.md) with the new commit and status snapshot in the same change. Never use an unreviewed moving branch as the project's reproducible engine baseline.
+After review, check out the selected commit, stage the Git link, and open a focused pull request. Never treat a moving branch as a reproducible engine baseline.
