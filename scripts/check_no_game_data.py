@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scan NOVA-owned tracked files using the upstream binary-format detector."""
+"""Scan FRAMEZERO-owned tracked files using the upstream binary-format detector."""
 from __future__ import annotations
 
 import os
@@ -14,7 +14,7 @@ ENGINE_SCANNER = ROOT / "engine" / "leonida" / "scripts" / "check_no_game_data.p
 def main() -> int:
     if not ENGINE_SCANNER.is_file():
         print(
-            "NOVA data scan: engine submodule is not initialized. "
+            "FRAMEZERO data scan: engine submodule is not initialized. "
             "Run: git submodule update --init --recursive",
             file=sys.stderr,
         )
@@ -33,7 +33,7 @@ def main() -> int:
             if path
         ]
     except (OSError, subprocess.CalledProcessError) as exc:
-        print(f"NOVA data scan: cannot list tracked files: {exc}", file=sys.stderr)
+        print(f"FRAMEZERO data scan: cannot list tracked files: {exc}", file=sys.stderr)
         return 2
 
     absolute_paths = [str(ROOT / Path(path)) for path in tracked]
@@ -44,11 +44,11 @@ def main() -> int:
             check=False,
         )
     except OSError as exc:
-        print(f"NOVA data scan: could not start detector: {exc}", file=sys.stderr)
+        print(f"FRAMEZERO data scan: could not start detector: {exc}", file=sys.stderr)
         return 2
 
     if scan.returncode == 0:
-        print(f"NOVA data scan passed ({len(tracked)} tracked root entries checked).")
+        print(f"FRAMEZERO data scan passed ({len(tracked)} tracked root entries checked).")
     return scan.returncode
 
 
