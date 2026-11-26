@@ -428,6 +428,10 @@ def main() -> int:
         def _log(self, message: str) -> None:
             self.console.config(state="normal")
             self.console.insert("end", message.rstrip() + "\n")
+            # Keep the visible console bounded during long builds.
+            line_count = int(self.console.index("end-1c").split(".")[0])
+            if line_count > 5000:
+                self.console.delete("1.0", f"{line_count - 5000}.0")
             self.console.see("end")
             self.console.config(state="disabled")
 
@@ -470,17 +474,31 @@ def main() -> int:
             self.run_button.config(state="disabled")
             self.stop_button.config(state="normal")
             self.footer.set("Running — see activity log")
-            threading.Thread(target=self._worker, args=(process,), daemon=True).start()
+            threading.Thread(
+                target=self._worker,
+                args=(process, kind == "doctor"),
+                daemon=True,
+            ).start()
 
-        def _worker(self, process: subprocess.Popen[str]) -> None:
+        def _worker(self, process: subprocess.Popen[str], collect_output: bool) -> None:
             output_parts: list[str] = []
+            batch: list[str] = []
+            batch_size = 0
             try:
                 if process.stdout is not None:
                     for line in process.stdout:
-                        output_parts.append(line)
-                        self.events.put(("line", line))
+                        if collect_output:
+                            output_parts.append(line)
+                        batch.append(line)
+                        batch_size += len(line)
+                        if len(batch) >= 40 or batch_size >= 16000:
+                            self.events.put(("output", "".join(batch)))
+                            batch.clear()
+                            batch_size = 0
+                if batch:
+                    self.events.put(("output", "".join(batch)))
                 code = process.wait()
-                self.events.put(("done", (code, "".join(output_parts))))
+                self.events.put(("done", (code, "".join(output_parts) if collect_output else "")))
             except OSError as exc:
                 self.events.put(("error", str(exc)))
 
@@ -488,7 +506,7 @@ def main() -> int:
             try:
                 while True:
                     kind, payload = self.events.get_nowait()
-                    if kind == "line":
+                    if kind == "output":
                         self._log(str(payload))
                     elif kind == "error":
                         self._log("ERROR: " + str(payload))
