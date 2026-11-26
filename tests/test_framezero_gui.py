@@ -1,36 +1,44 @@
 import unittest
+from pathlib import Path
 
 from framezero_gui import build_engine_args, build_validation_args
 
 
 class BuildProfileTests(unittest.TestCase):
     def test_runtime_profile(self):
+        game = str(Path("C:/Games/Package").expanduser())
+        output = str(Path("D:/FRAMEZERO").expanduser())
+        work = str(Path("E:/work").expanduser())
         self.assertEqual(
             build_engine_args("runtime", "C:/Games/Package", "D:/FRAMEZERO", "E:/work"),
             [
                 "build",
-                "--game", "C:/Games/Package",
-                "--out", "D:/FRAMEZERO",
-                "--work", "E:/work",
+                "--game", game,
+                "--out", output,
+                "--work", work,
                 "--stages", "check,shaders,runtime",
             ],
         )
 
     def test_asset_profile(self):
+        game = str(Path("/games/package").expanduser())
+        output = str(Path("/framezero/out").expanduser())
         self.assertEqual(
             build_engine_args("assets", "/games/package", "/framezero/out"),
             [
                 "build",
-                "--game", "/games/package",
-                "--out", "/framezero/out",
+                "--game", game,
+                "--out", output,
                 "--stages", "check,assets",
             ],
         )
 
     def test_full_profile_preserves_upstream_default(self):
+        game = str(Path("/games/package").expanduser())
+        output = str(Path("/framezero/out").expanduser())
         self.assertEqual(
             build_engine_args("full", "/games/package", "/framezero/out"),
-            ["build", "--game", "/games/package", "--out", "/framezero/out"],
+            ["build", "--game", game, "--out", output],
         )
 
     def test_invalid_profile_rejected(self):
@@ -48,9 +56,10 @@ class BuildProfileTests(unittest.TestCase):
             build_engine_args("runtime", "   ", "/framezero/out")
 
     def test_validation_does_not_build(self):
+        game = str(Path("/games/package").expanduser())
         self.assertEqual(
             build_validation_args("/games/package"),
-            ["build", "--game", "/games/package", "--check"],
+            ["build", "--game", game, "--check"],
         )
 
     def test_validation_rejects_empty_path(self):
