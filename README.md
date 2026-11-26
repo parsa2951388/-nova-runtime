@@ -1,79 +1,117 @@
-# NOVA Runtime
+# FRAMEZERO LAB
 
 <p align="center">
-  <img src="assets/nova-mark.svg" alt="NOVA Runtime" width="430">
+  <img src="assets/framezero-mark.svg" alt="FRAMEZERO LAB" width="760">
 </p>
 
+<p align="center">
+  <strong>Independent Runtime & Graphics Research</strong><br>
+  Reproducible engineering tools, local diagnostics, and compatibility experiments.
+</p>
 
-**An independent identity and developer experience for a PC runtime research project.**
+> [!IMPORTANT]
+> FRAMEZERO LAB is a developer workbench, not a finished game, a playable GTA VI PC port, or an official Rockstar, Take-Two, Microsoft, or Xbox project. Its current engine dependency is the separately maintained Leonida project, pinned as a Git submodule. The engine's upstream-reported progress is not a FRAMEZERO test result.
 
-NOVA Runtime is being built around the open-source Leonida engine lineage. NOVA keeps its own documentation, command-line entry point, engineering roadmap, and future user experience separate from the upstream engine.
+## What this repository provides
 
-> [!WARNING]
-> **NOVA is not a playable game or finished port.** The engine is pinned as a Git submodule. NOVA has not yet produced or verified its own end-to-end build.
+- **FRAMEZERO CLI** — system diagnostics, repository status, recursive submodule verification, and a carefully scoped front end for upstream commands.
+- **Desktop console** — a local GUI for diagnostics, package validation, build profiles, output streaming, and process cancellation.
+- **Reproducible source baseline** — the engine remains an external Git submodule at a recorded commit; no upstream history is copied or claimed.
+- **Integrity checks** — unit tests, compile checks, recursive submodule validation, and scans that help keep proprietary game data out of version control.
+- **Engineering documentation** — architecture boundaries, supported workflows, evidence standards, roadmap, and third-party notices.
 
-## Identity
+FRAMEZERO-owned tools do not download, decrypt, extract, or distribute game content. Any upstream workflow must be used only with inputs the user is legally entitled to access and that are already readable locally. Protection bypass, key extraction, DRM circumvention, and redistribution of game data are out of scope.
 
-See [the NOVA brand guide](docs/BRAND.md) for the logo, palette, and interface principles.
+## Quick start
 
-Launch the desktop setup console with `python nova_gui.py`; see [GUI documentation](docs/GUI.md).
+Clone the repository with all nested dependencies:
 
-## Repository layout
+~~~sh
+git clone --recurse-submodules https://github.com/parsa2951388/framezero-lab.git
+cd framezero-lab
+python framezero.py doctor
+python framezero.py verify
+python framezero_gui.py
+~~~
 
-- `engine/leonida/` — canonical upstream engine, pinned as a Git submodule.
-- `nova.py` — NOVA command-line front end. It checks the local toolchain and delegates engine operations without silently modifying upstream behavior.
-- `docs/` — NOVA architecture, development instructions, roadmap, and upstream pin.
-- `tests/` — tests for NOVA-owned tooling.
-- `THIRD_PARTY_NOTICES.md` and `LICENSE` — provenance and license information.
+If you already have a checkout:
 
-Clone with submodules so the engine is present:
-
-```sh
-git clone --recurse-submodules https://github.com/parsa2951388/-nova-runtime.git
-cd ./-nova-runtime
-python nova.py doctor
-```
-
-If the repository was cloned without submodules:
-
-```sh
+~~~sh
 git submodule update --init --recursive
-```
+python framezero.py verify
+~~~
 
-## First commands
+The older **nova.py** and **nova_gui.py** entry points remain as compatibility shims for existing local shortcuts. New instructions use the FRAMEZERO names.
 
-```sh
-python nova.py doctor          # inspect local prerequisites and available disk space
-python nova.py engine-help     # show the pinned engine's command-line help
-python nova.py build --find    # ask the engine to look for a local game package
-python nova.py build --check   # validate a package; do not build
-```
+## CLI
 
-The `build` command forwards its remaining arguments to the pinned upstream `make_game.py`. The engine's own documentation remains authoritative for all build flags.
+~~~sh
+python framezero.py --version
+python framezero.py status
+python framezero.py doctor
+python framezero.py doctor --json
+python framezero.py verify
+python framezero.py engine-help
+python framezero.py build --find
+python framezero.py build --check
+~~~
 
-## Verified upstream baseline
+- **status** reports the local source pin and initialization state.
+- **doctor** checks available tools, tool versions, the engine checkout, the nested dependency, and free space on the repository volume.
+- **verify** checks that recursive submodules are initialized and match their committed Git links.
+- **engine-help** and **build** forward arguments to the pinned upstream engine. That engine's documentation remains authoritative for its flags and behavior.
 
-NOVA currently pins [ubiquitarianism/leonida](https://github.com/ubiquitarianism/leonida) at commit [`b9320a118d46`](https://github.com/ubiquitarianism/leonida/commit/b9320a118d46b24de665e30e577425c131b4a2ee), dated **25 November 2026**. This is the active continuation; the previously reviewed `ExCorvus/leonida` repository is an older mirror and is not the pinned source.
+## Desktop console
 
-The upstream README at that commit reports that the game reaches the world phase after the story load on native Windows and Linux/Proton, but **a first world frame has not been verified**. Story mode is not reported as playable. This is upstream-reported status, not a NOVA test result. See [UPSTREAM.md](docs/UPSTREAM.md).
+Launch with:
 
-## Build prerequisites and storage
+~~~sh
+python framezero_gui.py
+~~~
 
-The upstream currently documents Windows 10/11 x64 as its primary build environment, Python 3.12+, .NET 8 SDK, Vulkan SDK tools (`spirv-as` and `spirv-val`), LLVM 21+ with the AMDGPU target for `llvm-mc`, and Visual Studio 2022 with Desktop C++ tools and Windows SDK 10.0.26100 or newer.
+The desktop console provides overview, diagnostics, and build tabs. It streams command output, prevents concurrent jobs, supports stopping a running child process, and escalates to a forced stop if needed. It does not include a game-launch action.
 
-The upstream estimates about **400 GiB** of work space for a full build. Its reduced `check,shaders,runtime` path is estimated at about **30 GiB**; the asset-export stage accounts for roughly another **370 GiB**. Work and output directories can be placed on separate drives. Review [DEVELOPMENT.md](docs/DEVELOPMENT.md) and the upstream README before starting a build.
+## Prerequisites and storage
 
-## Project rules
+The pinned upstream documentation currently lists Windows 10/11 x64 as its primary build environment, Python 3.12+, .NET 8 SDK, Vulkan SDK tools (spirv-as and spirv-val), LLVM 21+ with the AMDGPU target for llvm-mc, and Visual Studio 2022 with the Desktop C++ workload and Windows SDK 10.0.26100+ for the runtime stage.
 
-- Use only a game package the user is legally entitled to access and that is already readable locally.
-- Never commit or distribute game executables, archives, keys, extracted assets, generated shaders, saves, or other proprietary game data.
-- Do not implement key extraction, decryption, DRM circumvention, or protection bypasses. Stop and document the limitation if a required input is protected.
-- Keep local build products, logs, and generated assets outside version control.
-- Preserve upstream attribution, GPL notices, submodule provenance, and third-party licenses.
-- Distinguish upstream-reported functionality from functionality NOVA has actually built and tested.
+Upstream storage estimates are approximately 30 GiB for check, shaders, and runtime stages and 400 GiB for its full pipeline, including a large optional asset-export phase. These are upstream estimates, not guarantees. Confirm the current upstream documentation and your actual available work/output volumes before starting any build.
+
+## Evidence and project status
+
+Every public status statement must be labelled accurately:
+
+- **FRAMEZERO-tested** — reproduced in this repository's own CI or a documented local test.
+- **Upstream-reported** — stated by the pinned upstream project, not independently reproduced here.
+- **Unverified** — not yet measured or tested.
+
+At the current pinned baseline, the upstream README says the game reaches the world phase after story loading, but the first world frame has not been verified and nothing is playable. That is upstream-reported context, not a FRAMEZERO result. See [docs/UPSTREAM.md](docs/UPSTREAM.md).
+
+## Development and verification
+
+~~~sh
+python -m compileall -q framezero.py framezero_gui.py nova.py nova_gui.py scripts tests
+python -m unittest discover -s tests -v
+python scripts/verify_upstream.py
+python -I scripts/check_no_game_data.py
+~~~
+
+The CI workflow also checks the upstream submodule for prohibited game-data artifacts. Never commit game executables, archives, keys, extracted assets, generated shaders, textures, models, audio, saves, or logs containing proprietary content.
+
+## Project governance
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Development guide](docs/DEVELOPMENT.md)
+- [Desktop console](docs/GUI.md)
+- [Brand guide](docs/BRAND.md)
+- [Upstream provenance and status](docs/UPSTREAM.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 ## License and attribution
 
-The upstream engine is distributed under **GNU GPL v3.0**. The license text and project lineage are preserved here. NOVA's own additions are developed within that license baseline; upstream authorship is not claimed as NOVA authorship. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+This repository retains the upstream engine as a Git submodule and preserves its provenance. The pinned upstream engine identifies its license as **GNU GPL v3.0**; consult its current license and every nested dependency's notices before redistribution. FRAMEZERO does not claim authorship of Leonida or the work of its contributors.
 
-NOVA is an independent, unofficial community project. It is not affiliated with or endorsed by Rockstar Games, Take-Two Interactive, Microsoft, or Xbox. Product names and trademarks belong to their respective owners.
+FRAMEZERO's own additions are distributed under the repository's GPL-3.0 license baseline. Product names and trademarks belong to their respective owners.
